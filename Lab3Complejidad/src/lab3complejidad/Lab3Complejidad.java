@@ -5,8 +5,11 @@
  */
 package lab3complejidad;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.MathContext;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -17,27 +20,24 @@ public class Lab3Complejidad {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         
         int memory_size = 1000;
         CacheEmulator<BigDecimal> cache_uno = new CacheEmulator<>(memory_size);
         CacheEmulator<BigDecimal> cache_dos = new CacheEmulator<>(memory_size);
         CacheEmulator<BigDecimal> cache_tre = new CacheEmulator<>(memory_size);
         
-        String testvalue = "1000";
+        String testvalue = "5";
         BigDecimal bd;
         
         for (int i = 1; i <= Integer.parseInt(testvalue); i++) {
             System.gc();
-            System.out.println( CBRusingCache(new BigDecimal(testvalue), new BigDecimal(String.valueOf(i)), cache_uno, cache_dos, cache_tre) );
+            //System.out.println( CBRusingCache(new BigDecimal(testvalue), new BigDecimal(String.valueOf(i)), cache_uno, cache_dos, cache_tre) );
+            System.out.println(CoeficienteBinomialRecursivoMej(new BigDecimal(testvalue), new BigDecimal(String.valueOf(i))));
         }
-        /*
-        System.out.println("__________ no recursivo");
         
-        for (int i = 1; i <= Integer.parseInt(testvalue); i++) {
-        System.out.println( CBnoRecursive(new BigDecimal(testvalue), new BigDecimal(String.valueOf(i))) );
-        }
-        */
+        new FileWizard().writeToExcel("test.xlsx");
+        
     }
     
     static BigDecimal CBRusingCache(BigDecimal n, BigDecimal k, CacheEmulator<BigDecimal> cache_mod1, CacheEmulator<BigDecimal> cache_mod2, CacheEmulator<BigDecimal> cache_mod3)
@@ -66,6 +66,16 @@ public class Lab3Complejidad {
         cache_mod3.insert("CBRusingCache", result, n.toString(), k.toString());
         
         return result;
+    }
+    
+    public static BigDecimal CoeficienteBinomialRecursivoMej(BigDecimal nl, BigDecimal nk) {
+        if (nk.equals(BigDecimal.ZERO)) {
+            return BigDecimal.ONE;
+        } else if (nk.compareTo(nl.subtract(nk)) > 0) {
+            return CoeficienteBinomialRecursivoMej(nl, nl.subtract(nk));
+        } else {
+            return CoeficienteBinomialRecursivoMej(nl.subtract(BigDecimal.ONE), nk.subtract(BigDecimal.ONE)).multiply(nl).divide(nk);
+        }
     }
     
     static BigDecimal CBrecursive(BigDecimal n, BigDecimal k)
